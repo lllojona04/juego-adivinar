@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adivina al Jugador (2 Vidas)</title>
+  <style>
+    /* ---------------------------------------------------- */
+    /* ESTILOS GENERALES Y CONTENEDOR */
+    /* ---------------------------------------------------- */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+
+    .game-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    }
+
+    /* ---------------------------------------------------- */
+    /* ESTILOS DE IMAGEN Y REVELACIÓN */
+    /* ---------------------------------------------------- */
+    .image-wrapper {
+      position: relative;
+      width: 200px;
+      height: 300px;
+      margin: 20px auto;
+    }
+
+    .image-container {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 10px; 
+      border: 3px solid #333;
+      position: relative;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: clip-path 0.7s ease; /* Animación de revelación */
+    }
+
+    #revealName {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 5px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #D32F2F;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      text-align: center;
+    }
+    
+    #playerPosition {
+        margin-top: 10px;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #333;
+        min-height: 20px; /* Para evitar saltos de diseño */
+    }
+
+    /* ---------------------------------------------------- */
+    /* ESTILOS DE FORMULARIO Y BOTONES */
+    /* ---------------------------------------------------- */
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 80%;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover:not(:disabled) {
+        background-color: #45a049;
+    }
+
+    button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    
+    #nextPlayerButton {
+        background-color: #2196F3;
+    }
+    
+    #nextPlayerButton:hover:not(:disabled) {
+        background-color: #1976D2;
+    }
+
+    /* ---------------------------------------------------- */
+    /* MENSAJES Y PUNTUACIÓN */
+    /* ---------------------------------------------------- */
+    #message {
+      font-weight: bold;
+      min-height: 20px; 
+    }
+
+    .hearts {
+      font-size: 24px;
+      color: red;
+      margin-top: 10px;
+    }
+    
+    #finalScore h3 {
+        color: #FF9800;
+        margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Adivina al Jugador de Segunda División</h1>
+    
+    <div class="image-wrapper">
+      <div class="image-container">
+        <img id="playerImage" src="" alt="Jugador">
+      </div>
+      <span id="revealName"></span>
+    </div>
+    
+    <p id="playerPosition"></p> 
+    <input type="text" id="guessInput" placeholder="Escribe el nombre del jugador">
+    <button id="guessButton">Adivinar</button>
+    <button id="nextPlayerButton" style="display:none;">Siguiente Jugador</button>
+    
+    <p id="message"></p>
+    <p class="hearts" id="livesDisplay">❤️❤️</p>
+
+    <div id="finalScore" style="margin-top: 20px; display: none;">
+      <h3>🏆 Resultado Final 🏆</h3>
+      <p id="scoreText"></p>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------------------------------
+    // CONFIGURACIÓN DE JUGADORES (¡IMPORTANTE: Incluye la posición y verifica tus rutas!)
+    // ----------------------------------------------------
+    const players = [
+        { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" }, 
+      { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
+      { name: "Jorge salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
+      { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
+      { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
+      { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
+      { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
+      { name: "Andres Martin", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
+      // Agrega más jugadores aquí, asegurándote de incluir la 'position'
+    ];
+
+    // ----------------------------------------------------
+    // VARIABLES Y DOM
+    // ----------------------------------------------------
+    let currentPlayerIndex = 0;
+    let maxLives = 2; // Máximo de vidas
+    let lives = maxLives;
+    let correctGuesses = 0;
+    let failedGuesses = 0; 
+
+    const playerImage = document.getElementById("playerImage");
+    const playerPositionDisplay = document.getElementById("playerPosition");
+    const guessInput = document.getElementById("guessInput");
+    const guessButton = document.getElementById("guessButton");
+    const nextPlayerButton = document.getElementById("nextPlayerButton");
+    const message = document.getElementById("message");
+    const livesDisplay = document.getElementById("livesDisplay");
+    const revealName = document.getElementById("revealName");
+    const finalScoreDiv = document.getElementById("finalScore");
+    const scoreText = document.getElementById("scoreText");
+
+
+    // ----------------------------------------------------
+    // FUNCIONES DEL JUEGO
+    // ----------------------------------------------------
+
+    /** Actualiza los corazones (vidas). */
+    function updateHearts() {
+      let hearts = "";
+      for(let i=0; i<maxLives; i++){
+        hearts += i < lives ? "❤️" : "🤍";
+      }
+      livesDisplay.textContent = hearts;
+    }
+
+    /** Aplica el recorte (clip-path) según las vidas restantes (Lógica Solicitada). */
+    function setClipByLives() {
+      // 2 Vidas (Inicio) o 1 Vida (1er Fallo - solo muestra pista): Muestra de los ojos hacia arriba
+      if (lives >= 1) {
+        // Ajustado para mostrar la parte superior de la cabeza y los ojos
+        playerImage.style.clipPath = "inset(0% 15% 70% 15%)"; 
+      // 0 Vidas: Imagen completa
+      } else { 
+        playerImage.style.clipPath = "inset(0 0 0 0)";
+      }
+    }
+
+    /** Muestra el nombre revelado sobre la imagen. */
+    function showRevealedName(name) {
+      revealName.textContent = name;
+      revealName.style.opacity = 1;
+    }
+
+    /** Muestra la posición del jugador. */
+    function showPlayerPosition(position) {
+        playerPositionDisplay.textContent = `Posición: ${position}`;
+    }
+
+    /** Oculta la posición del jugador. */
+    function hidePlayerPosition() {
+        playerPositionDisplay.textContent = "";
+    }
+
+
+    /** Carga el siguiente jugador y reinicia el estado del juego. */
+    function loadPlayer() {
+      if (currentPlayerIndex >= players.length) {
+        displayFinalScore();
+        return;
+      }
+      
+      playerImage.src = players[currentPlayerIndex].image;
+      lives = maxLives; // Reinicia a 2 vidas
+      updateHearts();
+      setClipByLives(); // Aplicar el recorte inicial (ojos hacia arriba)
+      
+      guessInput.value = "";
+      message.textContent = "";
+      revealName.style.opacity = 0;
+      hidePlayerPosition(); 
+      
+      guessButton.style.display = 'inline-block';
+      guessButton.disabled = false;
+      nextPlayerButton.style.display = 'none';
+      guessInput.disabled = false;
+    }
+
+    /** Muestra el resumen de aciertos y fallos al finalizar todos los jugadores. */
+    function displayFinalScore() {
+      finalScoreDiv.style.display = 'block';
+      scoreText.innerHTML = `
+        Aciertos: <strong style="color: green;">${correctGuesses}</strong><br>
+        Fallos (No adivinados): <strong style="color: red;">${failedGuesses}</strong>
+      `;
+      guessButton.style.display = 'none';
+      nextPlayerButton.style.display = 'none';
+      message.textContent = "¡Felicidades! Has completado el juego.";
+      livesDisplay.textContent = "";
+      hidePlayerPosition(); 
+    }
+
+    // ----------------------------------------------------
+    // MANEJO DE EVENTOS
+    // ----------------------------------------------------
+
+    // Maneja el clic del botón Adivinar
+    guessButton.addEventListener("click", () => {
+      const guess = guessInput.value.trim().toLowerCase();
+      const correctName = players[currentPlayerIndex].name.toLowerCase();
+
+      if (guess === correctName) {
+        // **ACIERTO**
+        message.textContent = "¡Correcto! ¡Bien hecho!";
+        correctGuesses++;
+        guessButton.disabled = true;
+        guessInput.disabled = true;
+        
+        playerImage.style.clipPath = "inset(0 0 0 0)"; // Revela completo
+        hidePlayerPosition(); 
+        
+        nextPlayerButton.textContent = "Siguiente Jugador";
+        nextPlayerButton.style.display = 'inline-block';
+        
+      } else {
+        // **FALLO**
+        lives--;
+        
+        if (lives === 1) {
+            // 1er Fallo: Mantiene la imagen (ojos hacia arriba), Muestra la posición (pista)
+            updateHearts();
+            showPlayerPosition(players[currentPlayerIndex].position);
+            message.textContent = "Incorrecto. ¡Aquí tienes una pista!";
+            guessInput.value = ""; 
+
+        } else { // lives === 0
+          // **GAME OVER PARA ESTE JUGADOR (0 vidas)**
+          failedGuesses++;
+          updateHearts(); 
+          setClipByLives(); // Revela la imagen completa
+          hidePlayerPosition(); 
+          
+          message.innerHTML = `¡Se acabaron las vidas! <br>El jugador era: <strong>${players[currentPlayerIndex].name}</strong>`;
+          guessButton.disabled = true;
+          guessInput.disabled = true;
+          
+          showRevealedName(players[currentPlayerIndex].name); // Mostrar el nombre sobre la imagen
+          
+          nextPlayerButton.textContent = "Continuar";
+          nextPlayerButton.style.display = 'inline-block';
+        }
+      }
+    });
+
+    // Maneja el clic del botón Siguiente Jugador/Continuar
+    nextPlayerButton.addEventListener("click", () => {
+      currentPlayerIndex++;
+      loadPlayer();
+    });
+
+    // ----------------------------------------------------
+    // INICIO DEL JUEGO
+    // ----------------------------------------------------
+    loadPlayer();
+  </script>
+</body>
+</html>
