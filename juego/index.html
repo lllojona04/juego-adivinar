@@ -11,7 +11,7 @@
 
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      background: linear-gradient(135deg, #007a33, #ffffff); /* Verde y blanco Racing */
       color: #fff;
       display: flex;
       justify-content: center;
@@ -21,10 +21,10 @@
 
     .game-container, #startScreen {
       width: 90%;
-      max-width: 450px;
+      max-width: 500px;
       background-color: #fff;
-      color: #333;
-      border-radius: 15px;
+      color: #007a33;
+      border-radius: 20px;
       box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
       padding: 30px 25px;
       text-align: center;
@@ -32,26 +32,12 @@
     }
 
     h1, h2 {
-      color: #1e3c72;
+      color: #007a33;
       margin-bottom: 20px;
     }
 
-    #startScreen h2 {
-      font-size: 1.8em;
-    }
-
-    #startScreen p {
-      text-align: left;
-      margin-bottom: 10px;
-      font-size: 15px;
-    }
-
-    #startScreen ul {
-      text-align: left;
-      margin-bottom: 15px;
-      list-style: inside circle;
-      font-size: 14px;
-    }
+    #startScreen h2 { font-size: 1.8em; }
+    #startScreen p, #startScreen ul { text-align: left; margin-bottom: 10px; font-size: 15px; }
 
     button {
       padding: 12px 25px;
@@ -65,38 +51,22 @@
       color: #fff;
     }
 
-    #startButton {
-      background: #f39c12;
-    }
+    #startButton { background: #007a33; }
+    #startButton:hover { background: #005f26; }
 
-    #startButton:hover {
-      background: #e67e22;
-    }
+    #restartButton { background: #007a33; }
+    #restartButton:hover { background: #005f26; }
 
-    #restartButton {
-      background: #2ecc71;
-    }
-
-    #restartButton:hover {
-      background: #27ae60;
-    }
-
-    #exitButton {
-      background: #e74c3c;
-    }
-
-    #exitButton:hover {
-      background: #c0392b;
-    }
+    #exitButton { background: #c0392b; }
+    #exitButton:hover { background: #a93226; }
 
     .image-wrapper {
       position: relative;
-      width: 220px;
-      height: 330px;
-      margin: 20px auto;
+      width: 100%;
+      height: 400px;
+      margin: 20px 0;
       border-radius: 15px;
       overflow: hidden;
-      border: 4px solid #1e3c72;
       background: #ccc;
     }
 
@@ -105,6 +75,7 @@
       height: 100%;
       object-fit: cover;
       transition: clip-path 0.7s ease;
+      display: block;
     }
 
     #revealName {
@@ -112,72 +83,40 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: rgba(255,255,255,0.9);
-      padding: 8px 20px;
+      background-color: rgba(255,255,255,0.85);
+      padding: 12px 20px;
       border-radius: 10px;
       font-weight: bold;
-      font-size: 1.2em;
+      font-size: 1.4em;
       color: #d32f2f;
       z-index: 10;
       opacity: 0;
       transition: opacity 0.5s ease;
     }
 
-    #playerPosition {
-      margin-top: 10px;
-      font-size: 1.1em;
-      font-weight: bold;
-      min-height: 22px;
-    }
+    #playerPosition { margin-top: 10px; font-size: 1.2em; font-weight: bold; min-height: 22px; }
 
     input[type="text"] {
       padding: 12px;
       font-size: 16px;
       border-radius: 10px;
-      border: 2px solid #1e3c72;
+      border: 2px solid #007a33;
       width: 80%;
       margin-bottom: 15px;
     }
 
-    #guessButton, #nextPlayerButton {
-      width: 80%;
-      margin-bottom: 15px;
-    }
+    #guessButton, #nextPlayerButton { width: 80%; margin-bottom: 15px; }
 
-    #guessButton {
-      background-color: #3498db;
-    }
+    #guessButton { background-color: #28a745; }
+    #guessButton:hover:not(:disabled) { background-color: #218838; }
 
-    #guessButton:hover:not(:disabled) {
-      background-color: #2980b9;
-    }
+    #nextPlayerButton { background-color: #17a2b8; }
+    #nextPlayerButton:hover:not(:disabled) { background-color: #117a8b; }
 
-    #nextPlayerButton {
-      background-color: #9b59b6;
-    }
+    #progressCounter { font-weight: bold; font-size: 18px; margin-bottom: 15px; }
+    .hearts { font-size: 28px; color: red; margin-top: 10px; }
+    #message { font-weight: bold; min-height: 22px; margin-bottom: 15px; color: #e67e22; }
 
-    #nextPlayerButton:hover:not(:disabled) {
-      background-color: #8e44ad;
-    }
-
-    #progressCounter {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 15px;
-    }
-
-    .hearts {
-      font-size: 28px;
-      color: red;
-      margin-top: 10px;
-    }
-
-    #message {
-      font-weight: bold;
-      min-height: 22px;
-      margin-bottom: 15px;
-      color: #e67e22;
-    }
   </style>
 </head>
 <body>
@@ -185,19 +124,19 @@
   <!-- Pantalla de inicio -->
   <div id="startScreen">
     <h2>¡Bienvenido a "Adivina al Jugador"!</h2>
-    <p><strong>Objetivo:</strong> Reconocer a los jugadores del Rcing De Santander a partir de  su imagen.</p>
+    <p><strong>Objetivo:</strong> Reconocer a los jugadores del Racing de Santander a partir de su imagen.</p>
     <p><strong>Cómo jugar:</strong></p>
     <ul>
-      <li>Se mostrará la imagen del jugador parcialmente oculta (solo los ojos visibles).</li>
+      <li>La imagen del jugador se mostrará parcialmente oculta.</li>
       <li>Tienes 2 vidas para adivinar:</li>
       <ul>
-        <li>Primera vida: intenta adivinar sin ayuda.</li>
-        <li>Segunda vida: se mostrará la posición del jugador como pista.</li>
+        <li>Primera vida: sin pistas.</li>
+        <li>Segunda vida: se mostrará la posición como pista.</li>
       </ul>
-      <li>Si fallas ambas vidas, la imagen se revelará y mostrará el nombre correcto.</li>
+      <li>Si fallas ambas, la imagen completa se revelará con el nombre.</li>
       <li>Avanza al siguiente jugador con el botón correspondiente.</li>
     </ul>
-    <p>El progreso se mostrará como “Llevas X de Y”.</p>
+    <p>Progreso: “Llevas X de Y”.</p>
     <button id="startButton">¡Comenzar!</button>
   </div>
 
@@ -230,7 +169,6 @@
   </div>
 
   <script>
-    // DOM
     const startScreen = document.getElementById("startScreen");
     const startButton = document.getElementById("startButton");
     const gameContainer = document.getElementById("gameContainer");
@@ -248,16 +186,15 @@
     const exitButton = document.getElementById("exitButton");
     const progressCounter = document.getElementById("progressCounter");
 
-    // Jugadores
     const players = [
       { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" },
-      { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" },
-      { name: "Jorge Salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
-      { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
-      { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
+      { name: "Mario Garcia", position: "Lateral izquierdo", image: "imagenes/jugador1.jpg" },
+      { name: "Jorge Salinas", position: "Lateral izquierdo", image: "imagenes/jugador2.jpg" },
+      { name: "Javi Castro", position: "Defensa central", image: "imagenes/jugador3.jpg" },
+      { name: "Marco Sangalli", position: "Extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
       { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
       { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" },
-      { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }
+      { name: "Andrés Martín", position: "Extremo derecho", image: "imagenes/jugador7.jpg" }
     ];
 
     let currentPlayerIndex = 0;
@@ -276,42 +213,21 @@
 
     function updateHearts() {
       let hearts = "";
-      for (let i = 0; i < maxLives; i++) {
-        hearts += i < lives ? "❤️" : "🤍";
-      }
+      for (let i = 0; i < maxLives; i++) hearts += i < lives ? "❤️" : "🤍";
       livesDisplay.textContent = hearts;
     }
 
     function setClipByLives() {
-      if (lives >= 1) {
-        playerImage.style.clipPath = "inset(0% 15% 70% 15%)";
-      } else {
-        playerImage.style.clipPath = "inset(0 0 0 0)";
-      }
+      playerImage.style.clipPath = lives >= 1 ? "inset(0% 0% 70% 0%)" : "inset(0 0 0 0)";
     }
 
-    function showPlayerPosition(position) {
-      playerPositionDisplay.textContent = `Posición: ${position}`;
-    }
-
-    function hidePlayerPosition() {
-      playerPositionDisplay.textContent = "";
-    }
-
-    function showRevealedName(name) {
-      revealName.textContent = name;
-      revealName.style.opacity = 1;
-    }
-
-    function updateProgressCounter() {
-      progressCounter.textContent = `Llevas ${currentPlayerIndex + 1} de ${players.length}`;
-    }
+    function showPlayerPosition(position) { playerPositionDisplay.textContent = `Posición: ${position}`; }
+    function hidePlayerPosition() { playerPositionDisplay.textContent = ""; }
+    function showRevealedName(name) { revealName.textContent = name; revealName.style.opacity = 1; }
+    function updateProgressCounter() { progressCounter.textContent = `Llevas ${currentPlayerIndex + 1} de ${players.length}`; }
 
     function loadPlayer() {
-      if (currentPlayerIndex >= players.length) {
-        displayFinalScore();
-        return;
-      }
+      if (currentPlayerIndex >= players.length) { displayFinalScore(); return; }
       playerImage.src = players[currentPlayerIndex].image;
       lives = maxLives;
       updateHearts();
@@ -337,65 +253,25 @@
       hidePlayerPosition();
     }
 
-    startButton.addEventListener("click", () => {
-      startScreen.style.display = "none";
-      gameContainer.style.display = "block";
-      shuffleArray(players);
-      loadPlayer();
-    });
-
+    startButton.addEventListener("click", () => { startScreen.style.display="none"; gameContainer.style.display="block"; shuffleArray(players); loadPlayer(); });
     guessButton.addEventListener("click", () => {
       const guess = guessInput.value.trim().toLowerCase();
       const correctName = players[currentPlayerIndex].name.toLowerCase();
       if (guess === correctName) {
-        correctGuesses++;
-        guessButton.disabled = true;
-        guessInput.disabled = true;
-        playerImage.style.clipPath = "inset(0 0 0 0)";
-        hidePlayerPosition();
-        nextPlayerButton.textContent = "Siguiente Jugador";
-        nextPlayerButton.style.display = 'inline-block';
+        correctGuesses++; guessButton.disabled = true; guessInput.disabled = true; playerImage.style.clipPath="inset(0 0 0 0)"; hidePlayerPosition();
+        nextPlayerButton.textContent="Siguiente Jugador"; nextPlayerButton.style.display='inline-block';
       } else {
         lives--;
-        if (lives === 1) {
-          updateHearts();
-          showPlayerPosition(players[currentPlayerIndex].position);
-          message.textContent = "Incorrecto. ¡Aquí tienes una pista!";
-          guessInput.value = "";
-        } else {
-          failedGuesses++;
-          updateHearts();
-          setClipByLives();
-          hidePlayerPosition();
-          message.innerHTML = `¡Se acabaron las vidas! <br>El jugador era: <strong>${players[currentPlayerIndex].name}</strong>`;
-          guessButton.disabled = true;
-          guessInput.disabled = true;
-          showRevealedName(players[currentPlayerIndex].name);
-          nextPlayerButton.textContent = "Continuar";
-          nextPlayerButton.style.display = 'inline-block';
-        }
+        if (lives===1){ updateHearts(); showPlayerPosition(players[currentPlayerIndex].position); message.textContent="Incorrecto. ¡Aquí tienes una pista!"; guessInput.value=""; }
+        else { failedGuesses++; updateHearts(); setClipByLives(); hidePlayerPosition(); message.innerHTML=`¡Se acabaron las vidas! <br>El jugador era: <strong>${players[currentPlayerIndex].name}</strong>`; guessButton.disabled=true; guessInput.disabled=true; showRevealedName(players[currentPlayerIndex].name); nextPlayerButton.textContent="Continuar"; nextPlayerButton.style.display='inline-block'; }
       }
     });
 
-    nextPlayerButton.addEventListener("click", () => {
-      currentPlayerIndex++;
-      loadPlayer();
-    });
+    nextPlayerButton.addEventListener("click", ()=>{ currentPlayerIndex++; loadPlayer(); });
+    restartButton.addEventListener("click", ()=>{ shuffleArray(players); currentPlayerIndex=0; correctGuesses=0; failedGuesses=0; finalScoreDiv.style.display='none'; loadPlayer(); });
+    exitButton.addEventListener("click", ()=>{ window.close(); });
 
-    restartButton.addEventListener("click", () => {
-      shuffleArray(players);
-      currentPlayerIndex = 0;
-      correctGuesses = 0;
-      failedGuesses = 0;
-      finalScoreDiv.style.display = 'none';
-      loadPlayer();
-    });
-
-    exitButton.addEventListener("click", () => {
-      window.close();
-    });
   </script>
 
 </body>
 </html>
-
