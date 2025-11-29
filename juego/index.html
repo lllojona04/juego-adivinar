@@ -150,6 +150,7 @@
 </head>
 <body>
   <div class="game-container">
+    <p id="scoreCounter" style="font-weight:bold; font-size:18px; margin-bottom:10px;">Aciertos: 0</p>
     <h1>Adivina al Jugador de Segunda División</h1>
     
     <div class="image-wrapper">
@@ -181,7 +182,7 @@
       { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
       { name: "Jorge Salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
       { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
-      { name: "Marco Sangalli", position: "extremo izquierdo o lateral derecho", image: "imagenes/jugador4.jpg" },
+      { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
       { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
       { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
       { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
@@ -205,6 +206,7 @@
     const scoreText = document.getElementById("scoreText");
     const restartButton = document.getElementById("restartButton");
     const exitButton = document.getElementById("exitButton");
+    const scoreCounter = document.getElementById("scoreCounter");
 
     function updateHearts() {
       let hearts = "";
@@ -243,6 +245,10 @@
       return array;
     }
 
+    function updateScoreCounter() {
+      scoreCounter.textContent = `Aciertos: ${correctGuesses}`;
+    }
+
     function loadPlayer() {
       if (currentPlayerIndex >= players.length) {
         displayFinalScore();
@@ -277,7 +283,6 @@
       livesDisplay.textContent = "";
       hidePlayerPosition(); 
 
-      // Mostrar botones finales
       restartButton.style.display = 'inline-block';
       exitButton.style.display = 'inline-block';
     }
@@ -289,6 +294,7 @@
       if (guess === correctName) {
         message.textContent = "¡Correcto! ¡Bien hecho!";
         correctGuesses++;
+        updateScoreCounter();
         guessButton.disabled = true;
         guessInput.disabled = true;
         playerImage.style.clipPath = "inset(0 0 0 0)";
@@ -327,6 +333,7 @@
       currentPlayerIndex = 0;
       correctGuesses = 0;
       failedGuesses = 0;
+      updateScoreCounter();
       finalScoreDiv.style.display = 'none';
       restartButton.style.display = 'none';
       exitButton.style.display = 'none';
@@ -338,10 +345,9 @@
       // Alternativa si no permite cerrar: window.location.href = "about:blank";
     });
 
-    // INICIO DEL JUEGO
     shuffleArray(players);
+    updateScoreCounter();
     loadPlayer();
   </script>
 </body>
 </html>
-
