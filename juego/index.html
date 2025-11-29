@@ -126,7 +126,7 @@
       border-radius: 5px;
       border: none;
       cursor: pointer;
-      display: none; /* Oculto al inicio */
+      display: none;
     }
 
     #restartButton {
@@ -146,11 +146,51 @@
     #exitButton:hover {
       background-color: #d32f2f;
     }
+
+    /* Pantalla de inicio */
+    #startScreen {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    }
+
+    #startScreen h2 {
+      margin-bottom: 15px;
+    }
+
+    #startScreen p {
+      text-align: left;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="game-container">
-    <!-- Contador de progreso -->
+
+  <!-- Pantalla de inicio con explicación -->
+  <div id="startScreen">
+    <h2>Bienvenido a "Adivina al Jugador"</h2>
+    <p><strong>Objetivo:</strong> Reconocer a los jugadores de Segunda División a partir de su imagen.</p>
+    <p><strong>Cómo se juega:</strong></p>
+    <ul style="text-align:left;">
+      <li>Cada jugador aparece parcialmente oculto (solo los ojos visibles al inicio).</li>
+      <li>Tienes <strong>2 vidas por jugador</strong>:</li>
+      <ul>
+        <li>Primera vida: intenta adivinar sin ayuda.</li>
+        <li>Segunda vida: se muestra la posición del jugador como pista.</li>
+      </ul>
+      <li>Si fallas las dos vidas, la imagen se revela y muestra el nombre correcto.</li>
+      <li>Avanza al siguiente jugador con el botón correspondiente.</li>
+    </ul>
+    <p>Progreso: se mostrará “Llevas X de Y” para que veas cuántos jugadores has intentado.</p>
+    <button id="startButton">Comenzar</button>
+  </div>
+
+  <!-- Juego -->
+  <div class="game-container" id="gameContainer" style="display:none;">
     <p id="progressCounter" style="font-weight:bold; font-size:18px; margin-bottom:10px;">Llevas 0 de 0</p>
     <h1>Adivina al Jugador de Segunda División</h1>
     
@@ -178,6 +218,25 @@
   </div>
 
   <script>
+    // Elementos del DOM
+    const startScreen = document.getElementById("startScreen");
+    const startButton = document.getElementById("startButton");
+    const gameContainer = document.getElementById("gameContainer");
+    const playerImage = document.getElementById("playerImage");
+    const playerPositionDisplay = document.getElementById("playerPosition");
+    const guessInput = document.getElementById("guessInput");
+    const guessButton = document.getElementById("guessButton");
+    const nextPlayerButton = document.getElementById("nextPlayerButton");
+    const message = document.getElementById("message");
+    const livesDisplay = document.getElementById("livesDisplay");
+    const revealName = document.getElementById("revealName");
+    const finalScoreDiv = document.getElementById("finalScore");
+    const scoreText = document.getElementById("scoreText");
+    const restartButton = document.getElementById("restartButton");
+    const exitButton = document.getElementById("exitButton");
+    const progressCounter = document.getElementById("progressCounter");
+
+    // Jugadores
     const players = [
       { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" }, 
       { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
@@ -193,21 +252,16 @@
     let maxLives = 2;
     let lives = maxLives;
     let correctGuesses = 0;
-    let failedGuesses = 0; 
+    let failedGuesses = 0;
 
-    const playerImage = document.getElementById("playerImage");
-    const playerPositionDisplay = document.getElementById("playerPosition");
-    const guessInput = document.getElementById("guessInput");
-    const guessButton = document.getElementById("guessButton");
-    const nextPlayerButton = document.getElementById("nextPlayerButton");
-    const message = document.getElementById("message");
-    const livesDisplay = document.getElementById("livesDisplay");
-    const revealName = document.getElementById("revealName");
-    const finalScoreDiv = document.getElementById("finalScore");
-    const scoreText = document.getElementById("scoreText");
-    const restartButton = document.getElementById("restartButton");
-    const exitButton = document.getElementById("exitButton");
-    const progressCounter = document.getElementById("progressCounter");
+    // Funciones
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
 
     function updateHearts() {
       let hearts = "";
@@ -225,30 +279,21 @@
       }
     }
 
+    function showPlayerPosition(position) {
+      playerPositionDisplay.textContent = `Posición: ${position}`;
+    }
+
+    function hidePlayerPosition() {
+      playerPositionDisplay.textContent = "";
+    }
+
     function showRevealedName(name) {
       revealName.textContent = name;
       revealName.style.opacity = 1;
     }
 
-    function showPlayerPosition(position) {
-        playerPositionDisplay.textContent = `Posición: ${position}`;
-    }
-
-    function hidePlayerPosition() {
-        playerPositionDisplay.textContent = "";
-    }
-
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    // Actualiza el contador de progreso "Llevas X de Y"
     function updateProgressCounter() {
-      progressCounter.textContent = `Llevas ${currentPlayerIndex} de ${players.length}`;
+      progressCounter.textContent = `Llevas ${currentPlayerIndex + 1} de ${players.length}`;
     }
 
     function loadPlayer() {
@@ -256,41 +301,41 @@
         displayFinalScore();
         return;
       }
-      
       playerImage.src = players[currentPlayerIndex].image;
       lives = maxLives;
       updateHearts();
       setClipByLives();
-      
       guessInput.value = "";
       message.textContent = "";
       revealName.style.opacity = 0;
-      hidePlayerPosition(); 
-
+      hidePlayerPosition();
       updateProgressCounter();
-      
-      guessButton.style.display = 'inline-block';
       guessButton.disabled = false;
-      nextPlayerButton.style.display = 'none';
       guessInput.disabled = false;
+      guessButton.style.display = 'inline-block';
+      nextPlayerButton.style.display = 'none';
     }
 
     function displayFinalScore() {
       finalScoreDiv.style.display = 'block';
       scoreText.innerHTML = `
-        Aciertos: <strong style="color: green;">${correctGuesses}</strong><br>
-        Fallos (No adivinados): <strong style="color: red;">${failedGuesses}</strong>
+        Aciertos: <strong style="color:green;">${correctGuesses}</strong><br>
+        Fallos: <strong style="color:red;">${failedGuesses}</strong>
       `;
       guessButton.style.display = 'none';
       nextPlayerButton.style.display = 'none';
       message.textContent = "¡Felicidades! Has completado el juego.";
       livesDisplay.textContent = "";
-      hidePlayerPosition(); 
-
-      restartButton.style.display = 'inline-block';
-      exitButton.style.display = 'inline-block';
-      progressCounter.textContent = `Llevas ${players.length} de ${players.length}`;
+      hidePlayerPosition();
     }
+
+    // Eventos del juego
+    startButton.addEventListener("click", () => {
+      startScreen.style.display = "none";
+      gameContainer.style.display = "block";
+      shuffleArray(players);
+      loadPlayer();
+    });
 
     guessButton.addEventListener("click", () => {
       const guess = guessInput.value.trim().toLowerCase();
@@ -301,21 +346,21 @@
         guessButton.disabled = true;
         guessInput.disabled = true;
         playerImage.style.clipPath = "inset(0 0 0 0)";
-        hidePlayerPosition(); 
+        hidePlayerPosition();
         nextPlayerButton.textContent = "Siguiente Jugador";
         nextPlayerButton.style.display = 'inline-block';
       } else {
         lives--;
         if (lives === 1) {
-            updateHearts();
-            showPlayerPosition(players[currentPlayerIndex].position);
-            message.textContent = "Incorrecto. ¡Aquí tienes una pista!";
-            guessInput.value = ""; 
+          updateHearts();
+          showPlayerPosition(players[currentPlayerIndex].position);
+          message.textContent = "Incorrecto. ¡Aquí tienes una pista!";
+          guessInput.value = "";
         } else {
           failedGuesses++;
-          updateHearts(); 
+          updateHearts();
           setClipByLives();
-          hidePlayerPosition(); 
+          hidePlayerPosition();
           message.innerHTML = `¡Se acabaron las vidas! <br>El jugador era: <strong>${players[currentPlayerIndex].name}</strong>`;
           guessButton.disabled = true;
           guessInput.disabled = true;
@@ -337,18 +382,12 @@
       correctGuesses = 0;
       failedGuesses = 0;
       finalScoreDiv.style.display = 'none';
-      restartButton.style.display = 'none';
-      exitButton.style.display = 'none';
       loadPlayer();
     });
 
     exitButton.addEventListener("click", () => {
       window.close();
-      // Alternativa si no permite cerrar: window.location.href = "about:blank";
     });
-
-    shuffleArray(players);
-    loadPlayer();
   </script>
 </body>
 </html>
