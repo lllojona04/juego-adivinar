@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adivina al Jugador (2 Vidas)</title>
   <style>
-    /* ---------------------------------------------------- */
-    /* ESTILOS GENERALES Y CONTENEDOR */
-    /* ---------------------------------------------------- */
     body {
       font-family: Arial, sans-serif;
       text-align: center;
@@ -23,9 +20,6 @@
       box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
     }
 
-    /* ---------------------------------------------------- */
-    /* ESTILOS DE IMAGEN Y REVELACIÓN */
-    /* ---------------------------------------------------- */
     .image-wrapper {
       position: relative;
       width: 200px;
@@ -46,7 +40,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: clip-path 0.7s ease; /* Animación de revelación */
+      transition: clip-path 0.7s ease;
     }
 
     #revealName {
@@ -72,12 +66,9 @@
         font-size: 1.1em;
         font-weight: bold;
         color: #333;
-        min-height: 20px; /* Para evitar saltos de diseño */
+        min-height: 20px;
     }
 
-    /* ---------------------------------------------------- */
-    /* ESTILOS DE FORMULARIO Y BOTONES */
-    /* ---------------------------------------------------- */
     input, button {
       padding: 10px;
       margin: 10px 0;
@@ -112,9 +103,6 @@
         background-color: #1976D2;
     }
 
-    /* ---------------------------------------------------- */
-    /* MENSAJES Y PUNTUACIÓN */
-    /* ---------------------------------------------------- */
     #message {
       font-weight: bold;
       min-height: 20px; 
@@ -129,6 +117,33 @@
     #finalScore h3 {
         color: #FF9800;
         margin-bottom: 5px;
+    }
+
+    #restartButton, #exitButton {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    #restartButton {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    #exitButton {
+        background-color: #f44336;
+        color: white;
+    }
+
+    #restartButton:hover {
+        background-color: #45a049;
+    }
+
+    #exitButton:hover {
+        background-color: #d32f2f;
     }
   </style>
 </head>
@@ -154,30 +169,25 @@
     <div id="finalScore" style="margin-top: 20px; display: none;">
       <h3>🏆 Resultado Final 🏆</h3>
       <p id="scoreText"></p>
+      <button id="restartButton">Volver a jugar</button>
+      <button id="exitButton">Salir</button>
     </div>
   </div>
 
   <script>
-    // ----------------------------------------------------
-    // CONFIGURACIÓN DE JUGADORES (¡IMPORTANTE: Incluye la posición y verifica tus rutas!)
-    // ----------------------------------------------------
     const players = [
         { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" }, 
-      { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
-      { name: "Jorge salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
-      { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
-      { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
-      { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
-      { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
-      { name: "Andrés Martín ", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
-      // Agrega más jugadores aquí, asegurándote de incluir la 'position'
+        { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
+        { name: "Jorge Salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
+        { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
+        { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
+        { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
+        { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
+        { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
     ];
 
-    // ----------------------------------------------------
-    // VARIABLES Y DOM
-    // ----------------------------------------------------
     let currentPlayerIndex = 0;
-    let maxLives = 2; // Máximo de vidas
+    let maxLives = 2;
     let lives = maxLives;
     let correctGuesses = 0;
     let failedGuesses = 0; 
@@ -192,13 +202,9 @@
     const revealName = document.getElementById("revealName");
     const finalScoreDiv = document.getElementById("finalScore");
     const scoreText = document.getElementById("scoreText");
+    const restartButton = document.getElementById("restartButton");
+    const exitButton = document.getElementById("exitButton");
 
-
-    // ----------------------------------------------------
-    // FUNCIONES DEL JUEGO
-    // ----------------------------------------------------
-
-    /** Actualiza los corazones (vidas). */
     function updateHearts() {
       let hearts = "";
       for(let i=0; i<maxLives; i++){
@@ -207,36 +213,35 @@
       livesDisplay.textContent = hearts;
     }
 
-    /** Aplica el recorte (clip-path) según las vidas restantes (Lógica Solicitada). */
     function setClipByLives() {
-      // 2 Vidas (Inicio) o 1 Vida (1er Fallo - solo muestra pista): Muestra de los ojos hacia arriba
       if (lives >= 1) {
-        // Ajustado para mostrar la parte superior de la cabeza y los ojos
         playerImage.style.clipPath = "inset(0% 15% 70% 15%)"; 
-      // 0 Vidas: Imagen completa
       } else { 
         playerImage.style.clipPath = "inset(0 0 0 0)";
       }
     }
 
-    /** Muestra el nombre revelado sobre la imagen. */
     function showRevealedName(name) {
       revealName.textContent = name;
       revealName.style.opacity = 1;
     }
 
-    /** Muestra la posición del jugador. */
     function showPlayerPosition(position) {
         playerPositionDisplay.textContent = `Posición: ${position}`;
     }
 
-    /** Oculta la posición del jugador. */
     function hidePlayerPosition() {
         playerPositionDisplay.textContent = "";
     }
 
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
 
-    /** Carga el siguiente jugador y reinicia el estado del juego. */
     function loadPlayer() {
       if (currentPlayerIndex >= players.length) {
         displayFinalScore();
@@ -244,9 +249,9 @@
       }
       
       playerImage.src = players[currentPlayerIndex].image;
-      lives = maxLives; // Reinicia a 2 vidas
+      lives = maxLives;
       updateHearts();
-      setClipByLives(); // Aplicar el recorte inicial (ojos hacia arriba)
+      setClipByLives();
       
       guessInput.value = "";
       message.textContent = "";
@@ -259,7 +264,6 @@
       guessInput.disabled = false;
     }
 
-    /** Muestra el resumen de aciertos y fallos al finalizar todos los jugadores. */
     function displayFinalScore() {
       finalScoreDiv.style.display = 'block';
       scoreText.innerHTML = `
@@ -273,69 +277,63 @@
       hidePlayerPosition(); 
     }
 
-    // ----------------------------------------------------
-    // MANEJO DE EVENTOS
-    // ----------------------------------------------------
-
-    // Maneja el clic del botón Adivinar
     guessButton.addEventListener("click", () => {
       const guess = guessInput.value.trim().toLowerCase();
       const correctName = players[currentPlayerIndex].name.toLowerCase();
 
       if (guess === correctName) {
-        // **ACIERTO**
         message.textContent = "¡Correcto! ¡Bien hecho!";
         correctGuesses++;
         guessButton.disabled = true;
         guessInput.disabled = true;
-        
-        playerImage.style.clipPath = "inset(0 0 0 0)"; // Revela completo
+        playerImage.style.clipPath = "inset(0 0 0 0)";
         hidePlayerPosition(); 
-        
         nextPlayerButton.textContent = "Siguiente Jugador";
         nextPlayerButton.style.display = 'inline-block';
-        
       } else {
-        // **FALLO**
         lives--;
-        
         if (lives === 1) {
-            // 1er Fallo: Mantiene la imagen (ojos hacia arriba), Muestra la posición (pista)
             updateHearts();
             showPlayerPosition(players[currentPlayerIndex].position);
             message.textContent = "Incorrecto. ¡Aquí tienes una pista!";
             guessInput.value = ""; 
-
-        } else { // lives === 0
-          // **GAME OVER PARA ESTE JUGADOR (0 vidas)**
+        } else {
           failedGuesses++;
           updateHearts(); 
-          setClipByLives(); // Revela la imagen completa
+          setClipByLives();
           hidePlayerPosition(); 
-          
           message.innerHTML = `¡Se acabaron las vidas! <br>El jugador era: <strong>${players[currentPlayerIndex].name}</strong>`;
           guessButton.disabled = true;
           guessInput.disabled = true;
-          
-          showRevealedName(players[currentPlayerIndex].name); // Mostrar el nombre sobre la imagen
-          
+          showRevealedName(players[currentPlayerIndex].name);
           nextPlayerButton.textContent = "Continuar";
           nextPlayerButton.style.display = 'inline-block';
         }
       }
     });
 
-    // Maneja el clic del botón Siguiente Jugador/Continuar
     nextPlayerButton.addEventListener("click", () => {
       currentPlayerIndex++;
       loadPlayer();
     });
 
-    // ----------------------------------------------------
+    restartButton.addEventListener("click", () => {
+      shuffleArray(players);
+      currentPlayerIndex = 0;
+      correctGuesses = 0;
+      failedGuesses = 0;
+      finalScoreDiv.style.display = 'none';
+      loadPlayer();
+    });
+
+    exitButton.addEventListener("click", () => {
+      window.close();
+      // Alternativa si no permite cerrar: window.location.href = "about:blank";
+    });
+
     // INICIO DEL JUEGO
-    // ----------------------------------------------------
+    shuffleArray(players); // Mezclamos al inicio
     loadPlayer();
   </script>
 </body>
-
 </html>
