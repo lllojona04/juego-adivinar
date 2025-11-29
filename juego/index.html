@@ -150,7 +150,8 @@
 </head>
 <body>
   <div class="game-container">
-    <p id="scoreCounter" style="font-weight:bold; font-size:18px; margin-bottom:10px;">Aciertos: 0</p>
+    <!-- Contador de progreso -->
+    <p id="progressCounter" style="font-weight:bold; font-size:18px; margin-bottom:10px;">Llevas 0 de 0</p>
     <h1>Adivina al Jugador de Segunda División</h1>
     
     <div class="image-wrapper">
@@ -206,7 +207,7 @@
     const scoreText = document.getElementById("scoreText");
     const restartButton = document.getElementById("restartButton");
     const exitButton = document.getElementById("exitButton");
-    const scoreCounter = document.getElementById("scoreCounter");
+    const progressCounter = document.getElementById("progressCounter");
 
     function updateHearts() {
       let hearts = "";
@@ -245,8 +246,9 @@
       return array;
     }
 
-    function updateScoreCounter() {
-      scoreCounter.textContent = `Aciertos: ${correctGuesses}`;
+    // Actualiza el contador de progreso "Llevas X de Y"
+    function updateProgressCounter() {
+      progressCounter.textContent = `Llevas ${currentPlayerIndex} de ${players.length}`;
     }
 
     function loadPlayer() {
@@ -264,6 +266,8 @@
       message.textContent = "";
       revealName.style.opacity = 0;
       hidePlayerPosition(); 
+
+      updateProgressCounter();
       
       guessButton.style.display = 'inline-block';
       guessButton.disabled = false;
@@ -285,6 +289,7 @@
 
       restartButton.style.display = 'inline-block';
       exitButton.style.display = 'inline-block';
+      progressCounter.textContent = `Llevas ${players.length} de ${players.length}`;
     }
 
     guessButton.addEventListener("click", () => {
@@ -292,9 +297,7 @@
       const correctName = players[currentPlayerIndex].name.toLowerCase();
 
       if (guess === correctName) {
-        message.textContent = "¡Correcto! ¡Bien hecho!";
         correctGuesses++;
-        updateScoreCounter();
         guessButton.disabled = true;
         guessInput.disabled = true;
         playerImage.style.clipPath = "inset(0 0 0 0)";
@@ -333,7 +336,6 @@
       currentPlayerIndex = 0;
       correctGuesses = 0;
       failedGuesses = 0;
-      updateScoreCounter();
       finalScoreDiv.style.display = 'none';
       restartButton.style.display = 'none';
       exitButton.style.display = 'none';
@@ -346,7 +348,6 @@
     });
 
     shuffleArray(players);
-    updateScoreCounter();
     loadPlayer();
   </script>
 </body>
