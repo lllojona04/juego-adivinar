@@ -62,11 +62,11 @@
     }
     
     #playerPosition {
-        margin-top: 10px;
-        font-size: 1.1em;
-        font-weight: bold;
-        color: #333;
-        min-height: 20px;
+      margin-top: 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #333;
+      min-height: 20px;
     }
 
     input, button {
@@ -85,22 +85,22 @@
       border-radius: 5px;
       transition: background-color 0.3s;
     }
-    
+
     button:hover:not(:disabled) {
-        background-color: #45a049;
+      background-color: #45a049;
     }
 
     button:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
+      background-color: #ccc;
+      cursor: not-allowed;
     }
-    
+
     #nextPlayerButton {
-        background-color: #2196F3;
+      background-color: #2196F3;
     }
-    
+
     #nextPlayerButton:hover:not(:disabled) {
-        background-color: #1976D2;
+      background-color: #1976D2;
     }
 
     #message {
@@ -113,37 +113,38 @@
       color: red;
       margin-top: 10px;
     }
-    
+
     #finalScore h3 {
-        color: #FF9800;
-        margin-bottom: 5px;
+      color: #FF9800;
+      margin-bottom: 5px;
     }
 
     #restartButton, #exitButton {
-        padding: 10px 20px;
-        margin: 5px;
-        font-size: 16px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      display: none; /* Oculto al inicio */
     }
 
     #restartButton {
-        background-color: #4CAF50;
-        color: white;
+      background-color: #4CAF50;
+      color: white;
     }
 
     #exitButton {
-        background-color: #f44336;
-        color: white;
+      background-color: #f44336;
+      color: white;
     }
 
     #restartButton:hover {
-        background-color: #45a049;
+      background-color: #45a049;
     }
 
     #exitButton:hover {
-        background-color: #d32f2f;
+      background-color: #d32f2f;
     }
   </style>
 </head>
@@ -176,14 +177,14 @@
 
   <script>
     const players = [
-        { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" }, 
-        { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
-        { name: "Jorge Salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
-        { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
-        { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
-        { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
-        { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
-        { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
+      { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" }, 
+      { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
+      { name: "Jorge Salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
+      { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
+      { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
+      { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
+      { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
+      { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
     ];
 
     let currentPlayerIndex = 0;
@@ -275,6 +276,10 @@
       message.textContent = "¡Felicidades! Has completado el juego.";
       livesDisplay.textContent = "";
       hidePlayerPosition(); 
+
+      // Mostrar botones finales
+      restartButton.style.display = 'inline-block';
+      exitButton.style.display = 'inline-block';
     }
 
     guessButton.addEventListener("click", () => {
@@ -323,6 +328,8 @@
       correctGuesses = 0;
       failedGuesses = 0;
       finalScoreDiv.style.display = 'none';
+      restartButton.style.display = 'none';
+      exitButton.style.display = 'none';
       loadPlayer();
     });
 
@@ -332,7 +339,7 @@
     });
 
     // INICIO DEL JUEGO
-    shuffleArray(players); // Mezclamos al inicio
+    shuffleArray(players);
     loadPlayer();
   </script>
 </body>
