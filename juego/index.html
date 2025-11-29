@@ -5,35 +5,99 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adivina al Jugador (2 Vidas)</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    * { box-sizing: border-box; margin:0; padding:0; }
+
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    .game-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: white;
+    .game-container, #startScreen {
+      width: 90%;
+      max-width: 450px;
+      background-color: #fff;
+      color: #333;
+      border-radius: 15px;
+      box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
+      padding: 30px 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1, h2 {
+      color: #1e3c72;
+      margin-bottom: 20px;
+    }
+
+    #startScreen h2 {
+      font-size: 1.8em;
+    }
+
+    #startScreen p {
+      text-align: left;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    #startScreen ul {
+      text-align: left;
+      margin-bottom: 15px;
+      list-style: inside circle;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 12px 25px;
+      margin: 10px 5px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
       border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #fff;
+    }
+
+    #startButton {
+      background: #f39c12;
+    }
+
+    #startButton:hover {
+      background: #e67e22;
+    }
+
+    #restartButton {
+      background: #2ecc71;
+    }
+
+    #restartButton:hover {
+      background: #27ae60;
+    }
+
+    #exitButton {
+      background: #e74c3c;
+    }
+
+    #exitButton:hover {
+      background: #c0392b;
     }
 
     .image-wrapper {
       position: relative;
-      width: 200px;
-      height: 300px;
+      width: 220px;
+      height: 330px;
       margin: 20px auto;
-    }
-
-    .image-container {
-      width: 100%;
-      height: 100%;
+      border-radius: 15px;
       overflow: hidden;
-      border-radius: 10px; 
-      border: 3px solid #333;
-      position: relative;
+      border: 4px solid #1e3c72;
+      background: #ccc;
     }
 
     .image-container img {
@@ -48,151 +112,99 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: rgba(255, 255, 255, 0.85);
-      padding: 5px 15px;
-      border-radius: 5px;
+      background-color: rgba(255,255,255,0.9);
+      padding: 8px 20px;
+      border-radius: 10px;
       font-weight: bold;
       font-size: 1.2em;
-      color: #D32F2F;
+      color: #d32f2f;
       z-index: 10;
       opacity: 0;
       transition: opacity 0.5s ease;
-      pointer-events: none;
-      text-align: center;
     }
-    
+
     #playerPosition {
       margin-top: 10px;
       font-size: 1.1em;
       font-weight: bold;
-      color: #333;
-      min-height: 20px;
+      min-height: 22px;
     }
 
-    input, button {
-      padding: 10px;
-      margin: 10px 0;
-      width: 80%;
+    input[type="text"] {
+      padding: 12px;
       font-size: 16px;
-      box-sizing: border-box;
+      border-radius: 10px;
+      border: 2px solid #1e3c72;
+      width: 80%;
+      margin-bottom: 15px;
     }
 
-    button {
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      transition: background-color 0.3s;
+    #guessButton, #nextPlayerButton {
+      width: 80%;
+      margin-bottom: 15px;
     }
 
-    button:hover:not(:disabled) {
-      background-color: #45a049;
+    #guessButton {
+      background-color: #3498db;
     }
 
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
+    #guessButton:hover:not(:disabled) {
+      background-color: #2980b9;
     }
 
     #nextPlayerButton {
-      background-color: #2196F3;
+      background-color: #9b59b6;
     }
 
     #nextPlayerButton:hover:not(:disabled) {
-      background-color: #1976D2;
+      background-color: #8e44ad;
     }
 
-    #message {
+    #progressCounter {
       font-weight: bold;
-      min-height: 20px; 
+      font-size: 18px;
+      margin-bottom: 15px;
     }
 
     .hearts {
-      font-size: 24px;
+      font-size: 28px;
       color: red;
       margin-top: 10px;
     }
 
-    #finalScore h3 {
-      color: #FF9800;
-      margin-bottom: 5px;
-    }
-
-    #restartButton, #exitButton {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-      display: none;
-    }
-
-    #restartButton {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    #exitButton {
-      background-color: #f44336;
-      color: white;
-    }
-
-    #restartButton:hover {
-      background-color: #45a049;
-    }
-
-    #exitButton:hover {
-      background-color: #d32f2f;
-    }
-
-    /* Pantalla de inicio */
-    #startScreen {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
-    }
-
-    #startScreen h2 {
+    #message {
+      font-weight: bold;
+      min-height: 22px;
       margin-bottom: 15px;
-    }
-
-    #startScreen p {
-      text-align: left;
-      font-size: 14px;
-      margin-bottom: 10px;
+      color: #e67e22;
     }
   </style>
 </head>
 <body>
 
-  <!-- Pantalla de inicio con explicación -->
+  <!-- Pantalla de inicio -->
   <div id="startScreen">
-    <h2>Bienvenido a "Adivina al Jugador"</h2>
-    <p><strong>Objetivo:</strong> Reconocer a los jugadores del Racing De Santander a partir de su imagen.</p>
-    <p><strong>Cómo se juega:</strong></p>
-    <ul style="text-align:left;">
-      <li>Cada jugador aparece parcialmente oculto (solo los ojos visibles al inicio).</li>
-      <li>Tienes <strong>2 vidas por jugador</strong>:</li>
+    <h2>¡Bienvenido a "Adivina al Jugador"!</h2>
+    <p><strong>Objetivo:</strong> Reconocer a los jugadores del Rcing De Santander por su imagen.</p>
+    <p><strong>Cómo jugar:</strong></p>
+    <ul>
+      <li>Se mostrará la imagen del jugador parcialmente oculta (solo los ojos visibles).</li>
+      <li>Tienes 2 vidas para adivinar:</li>
       <ul>
         <li>Primera vida: intenta adivinar sin ayuda.</li>
-        <li>Segunda vida: se muestra la posición del jugador como pista.</li>
+        <li>Segunda vida: se mostrará la posición del jugador como pista.</li>
       </ul>
-      <li>Si fallas las dos vidas, la imagen se revela y muestra el nombre correcto.</li>
+      <li>Si fallas ambas vidas, la imagen se revelará y mostrará el nombre correcto.</li>
       <li>Avanza al siguiente jugador con el botón correspondiente.</li>
     </ul>
-    <p>Progreso: se mostrará “Llevas X de Y” para que veas cuántos jugadores has intentado.</p>
-    <button id="startButton">Comenzar</button>
+    <p>El progreso se mostrará como “Llevas X de Y”.</p>
+    <button id="startButton">¡Comenzar!</button>
   </div>
 
   <!-- Juego -->
   <div class="game-container" id="gameContainer" style="display:none;">
-    <p id="progressCounter" style="font-weight:bold; font-size:18px; margin-bottom:10px;">Llevas 0 de 0</p>
-    <h1>Adivina al Jugador de Segunda División</h1>
+    <p id="progressCounter">Llevas 0 de 0</p>
+    <h1>Adivina al Jugador</h1>
     
     <div class="image-wrapper">
       <div class="image-container">
@@ -200,16 +212,16 @@
       </div>
       <span id="revealName"></span>
     </div>
-    
-    <p id="playerPosition"></p> 
+
+    <p id="playerPosition"></p>
     <input type="text" id="guessInput" placeholder="Escribe el nombre del jugador">
     <button id="guessButton">Adivinar</button>
     <button id="nextPlayerButton" style="display:none;">Siguiente Jugador</button>
-    
+
     <p id="message"></p>
     <p class="hearts" id="livesDisplay">❤️❤️</p>
 
-    <div id="finalScore" style="margin-top: 20px; display: none;">
+    <div id="finalScore" style="margin-top:20px; display:none;">
       <h3>🏆 Resultado Final 🏆</h3>
       <p id="scoreText"></p>
       <button id="restartButton">Volver a jugar</button>
@@ -218,7 +230,7 @@
   </div>
 
   <script>
-    // Elementos del DOM
+    // DOM
     const startScreen = document.getElementById("startScreen");
     const startButton = document.getElementById("startButton");
     const gameContainer = document.getElementById("gameContainer");
@@ -238,14 +250,14 @@
 
     // Jugadores
     const players = [
-      { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" }, 
-      { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" }, 
+      { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" },
+      { name: "Mario Garcia", position: "lateral izquierdo", image: "imagenes/jugador1.jpg" },
       { name: "Jorge Salinas", position: "lateral izquierdo", image: "imagenes/jugador2.jpg" },
       { name: "Javi Castro", position: "defensa central", image: "imagenes/jugador3.jpg" },
       { name: "Marco Sangalli", position: "extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
       { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
-      { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" }, 
-      { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }          
+      { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" },
+      { name: "Andrés Martín", position: "extremo derecho", image: "imagenes/jugador7.jpg" }
     ];
 
     let currentPlayerIndex = 0;
@@ -254,7 +266,6 @@
     let correctGuesses = 0;
     let failedGuesses = 0;
 
-    // Funciones
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -265,7 +276,7 @@
 
     function updateHearts() {
       let hearts = "";
-      for(let i=0; i<maxLives; i++){
+      for (let i = 0; i < maxLives; i++) {
         hearts += i < lives ? "❤️" : "🤍";
       }
       livesDisplay.textContent = hearts;
@@ -273,8 +284,8 @@
 
     function setClipByLives() {
       if (lives >= 1) {
-        playerImage.style.clipPath = "inset(0% 15% 70% 15%)"; 
-      } else { 
+        playerImage.style.clipPath = "inset(0% 15% 70% 15%)";
+      } else {
         playerImage.style.clipPath = "inset(0 0 0 0)";
       }
     }
@@ -318,10 +329,7 @@
 
     function displayFinalScore() {
       finalScoreDiv.style.display = 'block';
-      scoreText.innerHTML = `
-        Aciertos: <strong style="color:green;">${correctGuesses}</strong><br>
-        Fallos: <strong style="color:red;">${failedGuesses}</strong>
-      `;
+      scoreText.innerHTML = `Aciertos: <strong style="color:green;">${correctGuesses}</strong><br>Fallos: <strong style="color:red;">${failedGuesses}</strong>`;
       guessButton.style.display = 'none';
       nextPlayerButton.style.display = 'none';
       message.textContent = "¡Felicidades! Has completado el juego.";
@@ -329,7 +337,6 @@
       hidePlayerPosition();
     }
 
-    // Eventos del juego
     startButton.addEventListener("click", () => {
       startScreen.style.display = "none";
       gameContainer.style.display = "block";
@@ -340,7 +347,6 @@
     guessButton.addEventListener("click", () => {
       const guess = guessInput.value.trim().toLowerCase();
       const correctName = players[currentPlayerIndex].name.toLowerCase();
-
       if (guess === correctName) {
         correctGuesses++;
         guessButton.disabled = true;
@@ -389,6 +395,6 @@
       window.close();
     });
   </script>
+
 </body>
 </html>
-
