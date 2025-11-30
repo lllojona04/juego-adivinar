@@ -3,276 +3,498 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adivina al Jugador (2 Vidas)</title>
+  <title>Quiz Racing de Santander - Edición Definitiva</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
 
-    * { box-sizing: border-box; margin:0; padding:0; }
+    :root {
+      --racing-green: #006a38;
+      --racing-dark: #004d29;
+      --accent-gold: #c5a059;
+      --error-red: #e74c3c;
+      --white: #ffffff;
+      --bg-gradient: linear-gradient(135deg, #004d29 0%, #000000 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #007a33, #ffffff); /* Verde y blanco Racing */
-      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--white);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
     }
 
-    .game-container, #startScreen {
+    /* Contenedores */
+    .container {
       width: 90%;
-      max-width: 500px;
-      background-color: #fff;
-      color: #007a33;
-      border-radius: 20px;
-      box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
-      padding: 30px 25px;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      border-radius: 24px;
+      padding: 30px;
       text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
       position: relative;
+      transition: transform 0.3s ease;
+      z-index: 10;
     }
 
-    h1, h2 {
-      color: #007a33;
-      margin-bottom: 20px;
+    h1 {
+      color: var(--racing-green);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
     }
 
-    #startScreen h2 { font-size: 1.8em; }
-    #startScreen p, #startScreen ul { text-align: left; margin-bottom: 10px; font-size: 15px; }
-
-    button {
-      padding: 12px 25px;
-      margin: 10px 5px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      color: #fff;
+    h2 { font-size: 1.4rem; color: var(--racing-dark); margin-bottom: 15px; }
+    
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #666;
     }
 
-    #startButton { background: #007a33; }
-    #startButton:hover { background: #005f26; }
-
-    #restartButton { background: #007a33; }
-    #restartButton:hover { background: #005f26; }
-
-    #exitButton { background: #c0392b; }
-    #exitButton:hover { background: #a93226; }
-
+    /* Imagen del Jugador */
     .image-wrapper {
       position: relative;
       width: 100%;
-      /* height: 400px; */
+      height: 350px;
       margin: 20px 0;
-      border-radius: 15px;
+      border-radius: 16px;
       overflow: hidden;
-      background: #ccc;
+      background: #eee;
+      border: 4px solid var(--racing-green);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
     }
 
-    .image-container img {
+    .image-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: clip-path 0.7s ease;
-      display: block;
+      object-position: top center;
+      transition: clip-path 0.5s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s ease;
+      clip-path: circle(15% at 50% 20%); 
+      filter: grayscale(100%);
     }
 
+    /* Nombre revelado */
     #revealName {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: rgba(255,255,255,0.85);
-      padding: 12px 20px;
-      border-radius: 10px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 106, 56, 0.95);
+      color: white;
+      padding: 15px;
       font-weight: bold;
-      font-size: 1.4em;
-      color: #d32f2f;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+      font-size: 1.3rem;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 20;
     }
+    
+    .revealed #revealName { transform: translateY(0); }
 
-    #playerPosition { margin-top: 10px; font-size: 1.2em; font-weight: bold; min-height: 22px; }
-
+    /* Inputs y Botones */
     input[type="text"] {
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: 2px solid #007a33;
-      width: 80%;
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 12px;
       margin-bottom: 15px;
+      text-align: center;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.3s;
     }
 
-    #guessButton, #nextPlayerButton { width: 80%; margin-bottom: 15px; }
+    input[type="text"]:focus { border-color: var(--racing-green); }
 
-    #guessButton { background-color: #28a745; }
-    #guessButton:hover:not(:disabled) { background-color: #218838; }
+    button {
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: white;
+      margin-bottom: 10px;
+    }
 
-    #nextPlayerButton { background-color: #17a2b8; }
-    #nextPlayerButton:hover:not(:disabled) { background-color: #117a8b; }
+    button:active { transform: scale(0.98); }
 
-    #progressCounter { font-weight: bold; font-size: 18px; margin-bottom: 15px; }
-    .hearts { font-size: 28px; color: red; margin-top: 10px; }
-    #message { font-weight: bold; min-height: 22px; margin-bottom: 15px; color: #e67e22; }
+    .btn-primary { background: var(--racing-green); box-shadow: 0 4px 15px rgba(0, 106, 56, 0.3); }
+    .btn-primary:hover { background: var(--racing-dark); }
+    
+    .btn-next { background: var(--accent-gold); color: #000; display: none; }
+    .btn-next:hover { background: #d4ac5e; }
+
+    .btn-restart { background: #333; }
+    .btn-exit { background: var(--error-red); }
+
+    /* Control de volumen */
+    #soundToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 50%;
+      z-index: 100;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #soundToggle:hover { background: rgba(255,255,255,0.4); }
+
+    /* Vidas y Mensajes */
+    .game-info { min-height: 70px; }
+    
+    .lives-container { font-size: 1.5rem; margin-top: 5px; letter-spacing: 5px; }
+    
+    .message { font-size: 0.95rem; font-weight: 600; margin-bottom: 5px; min-height: 20px; }
+    .message.error { color: var(--error-red); }
+    .message.success { color: var(--racing-green); }
+    .message.hint { color: var(--accent-gold); }
+
+    /* Animaciones */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
+    }
+    .shake { animation: shake 0.4s ease-in-out; }
+
+    /* Confeti */
+    .confetti {
+      position: absolute;
+      width: 10px; height: 10px;
+      background-color: #f00;
+      animation: fall linear forwards;
+      z-index: 5;
+    }
+    @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+    /* Reproductores Ocultos (Fuera de pantalla) */
+    .hidden-player { position: absolute; left: -9999px; top: -9999px; }
 
   </style>
 </head>
 <body>
 
-  <!-- Pantalla de inicio -->
-  <div id="startScreen">
-    <h2>¡Bienvenido a "Adivina al Jugador"!</h2>
-    <p><strong>Objetivo:</strong> Reconocer a los jugadores del Racing de Santander a partir de su imagen.</p>
-    <p><strong>Cómo jugar:</strong></p>
-    <ul>
-      <li>La imagen del jugador se mostrará parcialmente oculta.</li>
-      <li>Tienes 2 vidas para adivinar:</li>
-      <ul>
-        <li>Primera vida: sin pistas.</li>
-        <li>Segunda vida: se mostrará la posición como pista.</li>
-      </ul>
-      <li>Si fallas ambas, la imagen completa se revelará con el nombre.</li>
-      <li>Avanza al siguiente jugador con el botón correspondiente.</li>
-    </ul>
-    <p>Progreso: “Llevas X de Y”.</p>
-    <button id="startButton">¡Comenzar!</button>
+
+
+  <!-- REPRODUCTORES YOUTUBE OCULTOS -->
+  <!-- ID de Acierto: Fuente de Cacho / Himno -->
+  <div id="win-player" class="hidden-player"></div>
+  <!-- ID de Fallo: Sonido Fail / Sad Trombone -->
+  <div id="fail-player" class="hidden-player"></div>
+
+  <!-- PANTALLA INICIO -->
+  <div id="startScreen" class="container">
+    <h1>¿Conoces al Racing?</h1>
+    <h2>Adivina al Jugador</h2>
+    <p>Demuestra que eres un verdadero racinguista.</p>
+    <ul style="text-align: left; margin: 20px; font-size:0.9rem; color:#555;">
+    <button id="startButton" class="btn-primary">¡Comenzar Juego!</button>
   </div>
 
-  <!-- Juego -->
-  <div class="game-container" id="gameContainer" style="display:none;">
-    <p id="progressCounter">Llevas 0 de 0</p>
-    <h1>Adivina al Jugador</h1>
+  <!-- JUEGO PRINCIPAL -->
+  <div id="gameContainer" class="container" style="display:none;">
+    <div class="stats-bar">
+      <span id="progressCounter">1 / 8</span>
+      <span id="scoreCounter">Puntos: 0</span>
+    </div>
+
+    <div class="image-wrapper" id="imageWrapper">
+      <img id="playerImage" src="" alt="Jugador Oculto">
+      <div id="revealName"></div>
+    </div>
+
+    <div class="game-info">
+      <p id="message" class="message"></p>
+      <div id="livesDisplay" class="lives-container">❤️❤️</div>
+    </div>
+
+    <input type="text" id="guessInput" placeholder="Nombre del jugador..." autocomplete="off">
     
-    <div class="image-wrapper">
-      <div class="image-container">
-        <img id="playerImage" src="" alt="Jugador">
-      </div>
-      <span id="revealName"></span>
-    </div>
-
-    <p id="playerPosition"></p>
-    <input type="text" id="guessInput" placeholder="Escribe el nombre del jugador">
-    <button id="guessButton">Adivinar</button>
-    <button id="nextPlayerButton" style="display:none;">Siguiente Jugador</button>
-
-    <p id="message"></p>
-    <p class="hearts" id="livesDisplay">❤️❤️</p>
-
-    <div id="finalScore" style="margin-top:20px; display:none;">
-      <h3>🏆 Resultado Final 🏆</h3>
-      <p id="scoreText"></p>
-      <button id="restartButton">Volver a jugar</button>
-      <button id="exitButton">Salir</button>
-    </div>
+    <button id="guessButton" class="btn-primary">Comprobar</button>
+    <button id="nextPlayerButton" class="btn-next">Siguiente Jugador</button>
   </div>
+
+  <!-- PANTALLA FINAL -->
+  <div id="finalScore" class="container" style="display:none;">
+    <h1>¡Fin del Partido!</h1>
+    <div style="font-size: 4rem; margin: 20px 0;">🏆</div>
+    <p id="finalScoreText" style="font-size: 1.2rem; margin-bottom: 20px;"></p>
+    <button id="restartButton" class="btn-restart">Jugar de nuevo</button>
+    <button id="exitButton" class="btn-exit">Salir</button>
+  </div>
+
+  <!-- CARGA API YOUTUBE -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
-    const startScreen = document.getElementById("startScreen");
-    const startButton = document.getElementById("startButton");
-    const gameContainer = document.getElementById("gameContainer");
-    const playerImage = document.getElementById("playerImage");
-    const playerPositionDisplay = document.getElementById("playerPosition");
-    const guessInput = document.getElementById("guessInput");
-    const guessButton = document.getElementById("guessButton");
-    const nextPlayerButton = document.getElementById("nextPlayerButton");
-    const message = document.getElementById("message");
-    const livesDisplay = document.getElementById("livesDisplay");
-    const revealName = document.getElementById("revealName");
-    const finalScoreDiv = document.getElementById("finalScore");
-    const scoreText = document.getElementById("scoreText");
-    const restartButton = document.getElementById("restartButton");
-    const exitButton = document.getElementById("exitButton");
-    const progressCounter = document.getElementById("progressCounter");
-
+    // --- DATOS ---
     const players = [
-      { name: "Jokin Ezkieta", position: "Portero", image: "imagenes/jugador0.jpg" },
-      { name: "Mario Garcia", position: "Lateral izquierdo", image: "imagenes/jugador1.jpg" },
-      { name: "Jorge Salinas", position: "Lateral izquierdo", image: "imagenes/jugador2.jpg" },
-      { name: "Javi Castro", position: "Defensa central", image: "imagenes/jugador3.jpg" },
-      { name: "Marco Sangalli", position: "Extremo izquierdo o delantero", image: "imagenes/jugador4.jpg" },
-      { name: "Jeremy", position: "Delantero", image: "imagenes/jugador5.jpg" },
-      { name: "Asier Villalibre", position: "Delantero", image: "imagenes/jugador6.jpg" },
-      { name: "Andrés Martín", position: "Extremo derecho", image: "imagenes/jugador7.jpg" }
+      { name: "Jokin Ezkieta", aliases: ["jokin", "ezkieta"], position: "Portero", image: "imagenes/jugador0.jpg" },
+      { name: "Mario Garcia", aliases: ["mario", "mario garcia"], position: "Lateral Izquierdo", image: "imagenes/jugador1.jpg" },
+      { name: "Jorge Salinas", aliases: ["salinas", "jorge salinas"], position: "Lateral Izquierdo", image: "imagenes/jugador2.jpg" },
+      { name: "Javi Castro", aliases: ["castro", "javi castro"], position: "Defensa Central", image: "imagenes/jugador3.jpg" },
+      { name: "Marco Sangalli", aliases: ["sangalli", "marco"], position: "Extremo/Delantero", image: "imagenes/jugador4.jpg" },
+      { name: "Jeremy", aliases: ["jeremy", "arevalo"], position: "Delantero", image: "imagenes/jugador5.jpg" },
+      { name: "Asier Villalibre", aliases: ["villalibre", "asier", "bufalo"], position: "Delantero", image: "imagenes/jugador6.jpg" },
+      { name: "Andrés Martín", aliases: ["andres", "martin", "andres martin"], position: "Extremo Derecho", image: "imagenes/jugador7.jpg" }
     ];
 
-    let currentPlayerIndex = 0;
-    let maxLives = 2;
-    let lives = maxLives;
-    let correctGuesses = 0;
-    let failedGuesses = 0;
+    // --- CONFIGURACIÓN YOUTUBE ---
+    const WIN_VIDEO_ID = ''; // Fuente de Cacho
+    const FAIL_VIDEO_ID = 'CQeezCdF4mk'; // Fail Sound
 
-    function shuffleArray(array) {
+    let playerWin, playerFail;
+    let isMuted = false;
+
+    function onYouTubeIframeAPIReady() {
+      playerWin = new YT.Player('win-player', {
+        height: '0', width: '0',
+        videoId: WIN_VIDEO_ID,
+        playerVars: { 'playsinline': 1, 'controls': 0 }
+      });
+
+      playerFail = new YT.Player('fail-player', {
+        height: '0', width: '0',
+        videoId: FAIL_VIDEO_ID,
+        playerVars: { 'playsinline': 1, 'controls': 0 }
+      });
+    }
+
+    function playSound(type) {
+      if (isMuted) return;
+      stopSounds();
+      
+      if (type === 'win' && playerWin && playerWin.playVideo) {
+        playerWin.seekTo(0);
+        playerWin.playVideo();
+      } else if (type === 'fail' && playerFail && playerFail.playVideo) {
+        playerFail.seekTo(0);
+        playerFail.playVideo();
+      }
+    }
+
+    function stopSounds() {
+      if (playerWin && playerWin.stopVideo) playerWin.stopVideo();
+      if (playerFail && playerFail.stopVideo) playerFail.stopVideo();
+    }
+
+    // --- VARIABLES DE ESTADO ---
+    let currentIndex = 0;
+    let lives = 2;
+    let score = 0;
+    let gameActive = false;
+
+    // --- ELEMENTOS DOM ---
+    const screens = {
+      start: document.getElementById("startScreen"),
+      game: document.getElementById("gameContainer"),
+      end: document.getElementById("finalScore")
+    };
+    
+    const ui = {
+      img: document.getElementById("playerImage"),
+      wrapper: document.getElementById("imageWrapper"),
+      reveal: document.getElementById("revealName"),
+      input: document.getElementById("guessInput"),
+      btnGuess: document.getElementById("guessButton"),
+      btnNext: document.getElementById("nextPlayerButton"),
+      message: document.getElementById("message"),
+      lives: document.getElementById("livesDisplay"),
+      progress: document.getElementById("progressCounter"),
+      score: document.getElementById("scoreCounter"),
+      soundBtn: document.getElementById("soundToggle")
+    };
+
+    // --- UTILIDADES ---
+    const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+    function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
       }
-      return array;
     }
 
-    function updateHearts() {
-      let hearts = "";
-      for (let i = 0; i < maxLives; i++) hearts += i < lives ? "❤️" : "🤍";
-      livesDisplay.textContent = hearts;
-    }
-
-    function setClipByLives() {
-      playerImage.style.clipPath = lives >= 1 ? "inset(0% 0% 70% 0%)" : "inset(0 0 0 0)";
-    }
-
-    function showPlayerPosition(position) { playerPositionDisplay.textContent = `Posición: ${position}`; }
-    function hidePlayerPosition() { playerPositionDisplay.textContent = ""; }
-    function showRevealedName(name) { revealName.textContent = name; revealName.style.opacity = 1; }
-    function updateProgressCounter() { progressCounter.textContent = `Llevas ${currentPlayerIndex + 1} de ${players.length}`; }
-
-    function loadPlayer() {
-      if (currentPlayerIndex >= players.length) { displayFinalScore(); return; }
-      playerImage.src = players[currentPlayerIndex].image;
-      lives = maxLives;
-      updateHearts();
-      setClipByLives();
-      guessInput.value = "";
-      message.textContent = "";
-      revealName.style.opacity = 0;
-      hidePlayerPosition();
-      updateProgressCounter();
-      guessButton.disabled = false;
-      guessInput.disabled = false;
-      guessButton.style.display = 'inline-block';
-      nextPlayerButton.style.display = 'none';
-    }
-
-    function displayFinalScore() {
-      finalScoreDiv.style.display = 'block';
-      scoreText.innerHTML = `Aciertos: <strong style="color:green;">${correctGuesses}</strong><br>Fallos: <strong style="color:red;">${failedGuesses}</strong>`;
-      guessButton.style.display = 'none';
-      nextPlayerButton.style.display = 'none';
-      message.textContent = "¡Felicidades! Has completado el juego.";
-      livesDisplay.textContent = "";
-      hidePlayerPosition();
-    }
-
-    startButton.addEventListener("click", () => { startScreen.style.display="none"; gameContainer.style.display="block"; shuffleArray(players); loadPlayer(); });
-    guessButton.addEventListener("click", () => {
-      const guess = guessInput.value.trim().toLowerCase();
-      const correctName = players[currentPlayerIndex].name.toLowerCase();
-      if (guess === correctName) {
-        correctGuesses++; guessButton.disabled = true; guessInput.disabled = true; playerImage.style.clipPath="inset(0 0 0 0)"; hidePlayerPosition();
-        nextPlayerButton.textContent="Siguiente Jugador"; nextPlayerButton.style.display='inline-block';
-      } else {
-        lives--;
-        if (lives===1){ updateHearts(); showPlayerPosition(players[currentPlayerIndex].position); message.textContent="Incorrecto. ¡Aquí tienes una pista!"; guessInput.value=""; }
-        else { failedGuesses++; updateHearts(); setClipByLives(); hidePlayerPosition(); message.innerHTML=`¡Se acabaron las vidas! <br>El jugador era: <strong>${players[currentPlayerIndex].name}</strong>`; guessButton.disabled=true; guessInput.disabled=true; showRevealedName(players[currentPlayerIndex].name); nextPlayerButton.textContent="Continuar"; nextPlayerButton.style.display='inline-block'; }
+    function createConfetti() {
+      for(let i=0; i<30; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+        confetti.style.backgroundColor = ['#006a38', '#c5a059', '#fff'][Math.floor(Math.random()*3)];
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
       }
+    }
+
+    // --- LÓGICA DEL JUEGO ---
+
+    function initGame() {
+      shuffle(players);
+      currentIndex = 0;
+      score = 0;
+      stopSounds();
+      screens.start.style.display = 'none';
+      screens.end.style.display = 'none';
+      screens.game.style.display = 'block';
+      loadLevel();
+    }
+
+    function loadLevel() {
+      stopSounds(); 
+      if (currentIndex >= players.length) {
+        endGame();
+        return;
+      }
+
+      gameActive = true;
+      lives = 2;
+      const p = players[currentIndex];
+
+      ui.img.src = p.image;
+      ui.img.style.filter = "grayscale(100%) blur(2px)";
+      ui.img.style.clipPath = "circle(15% at 50% 20%)"; // Muy oculto
+      
+      ui.wrapper.classList.remove('revealed');
+      ui.input.value = "";
+      ui.input.disabled = false;
+      ui.input.focus();
+      ui.btnGuess.style.display = "inline-block";
+      ui.btnNext.style.display = "none";
+      ui.message.textContent = "🔍 ¿Quién es este jugador?";
+      ui.message.className = "message";
+      
+      updateStats();
+    }
+
+    function updateStats() {
+      ui.progress.textContent = `Jugador ${currentIndex + 1} / ${players.length}`;
+      ui.score.textContent = `Puntos: ${score}`;
+      ui.lives.textContent = lives === 2 ? "❤️❤️" : (lives === 1 ? "❤️🤍" : "🤍🤍");
+    }
+
+    function checkGuess() {
+      if (!gameActive) return;
+      const userText = normalize(ui.input.value);
+      const player = players[currentIndex];
+      const isCorrect = userText === normalize(player.name) || 
+                        player.aliases.some(alias => normalize(alias) === userText);
+
+      if (isCorrect) handleWin(player);
+      else handleFail(player);
+    }
+
+    function handleWin(player) {
+      gameActive = false;
+      score++;
+      ui.message.textContent = "¡GOL! ¡CORRECTO! ⚽";
+      ui.message.className = "message success";
+      createConfetti();
+      playSound('win'); 
+      endTurn(player.name, true);
+    }
+
+    function handleFail(player) {
+      lives--;
+      updateStats();
+      screens.game.classList.add('shake');
+      setTimeout(() => screens.game.classList.remove('shake'), 400);
+
+      if (lives === 1) {
+        ui.message.textContent = `Pista: Es ${player.position}`;
+        ui.message.className = "message hint";
+        // Pista: Se abre un poco, pero no mucho
+        ui.img.style.clipPath = "circle(25% at 50% 30%)"; 
+        ui.input.value = "";
+        ui.input.focus();
+      } else {
+        gameActive = false;
+        ui.message.textContent = "¡Se acabaron las vidas! ❌";
+        ui.message.className = "message error";
+        playSound('fail'); 
+        endTurn(player.name, false); // false = perdió
+      }
+    }
+
+    function endTurn(name, won) {
+      ui.input.disabled = true;
+      ui.btnGuess.style.display = "none";
+      ui.btnNext.style.display = "inline-block";
+      ui.reveal.textContent = name;
+      ui.wrapper.classList.add('revealed');
+
+      if (won) {
+        // ACIERTO: Se ve a color, pero con un recorte elegante (no completo del todo)
+        ui.img.style.filter = "grayscale(0%)";
+        ui.img.style.clipPath = "inset(0 0 20% 0)"; 
+      } else {
+        // FALLO (Vidas = 0): Se ve COMPLETAMENTE para que el usuario sepa quién era
+        ui.img.style.filter = "grayscale(0%)";
+        ui.img.style.clipPath = "inset(0 0 0 0)"; 
+      }
+    }
+
+    function endGame() {
+      stopSounds();
+      screens.game.style.display = 'none';
+      screens.end.style.display = 'block';
+      const resultElement = document.getElementById("finalScoreText");
+      
+      let msg = "";
+      if (score === players.length) msg = "¡INCREÍBLE! ¡Pleno absoluto!";
+      else if (score > players.length / 2) msg = "¡Muy bien! Conoces al equipo.";
+      else msg = "Necesitas ir más al Sardinero...";
+
+      resultElement.innerHTML = `Has acertado <strong style="color:var(--racing-green)">${score}</strong> de ${players.length}.<br><br>${msg}`;
+    }
+
+    // --- EVENT LISTENERS ---
+    document.getElementById("startButton").addEventListener("click", initGame);
+    ui.btnGuess.addEventListener("click", checkGuess);
+    ui.btnNext.addEventListener("click", () => { currentIndex++; loadLevel(); });
+    document.getElementById("restartButton").addEventListener("click", initGame);
+    document.getElementById("exitButton").addEventListener("click", () => window.close());
+    
+    ui.input.addEventListener("keypress", (e) => { if (e.key === "Enter") checkGuess(); });
+
+    ui.soundBtn.addEventListener("click", () => {
+      isMuted = !isMuted;
+      ui.soundBtn.textContent = isMuted ? "🔇" : "🔊";
+      if(isMuted) stopSounds();
     });
 
-    nextPlayerButton.addEventListener("click", ()=>{ currentPlayerIndex++; loadPlayer(); });
-    restartButton.addEventListener("click", ()=>{ shuffleArray(players); currentPlayerIndex=0; correctGuesses=0; failedGuesses=0; finalScoreDiv.style.display='none'; loadPlayer(); });
-    exitButton.addEventListener("click", ()=>{ window.close(); });
-
   </script>
-
 </body>
 </html>
-
